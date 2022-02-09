@@ -1,16 +1,57 @@
+import axios from 'axios';
+import { useState } from 'react';
 import './styles.css';
+type FormData = {
+  user: string;
+};
+type Address = {
+  html_url: string;
+  avatar_url: string;
+  name: string;
+  location: string;
+  followers: string;
+};
+
 const GitSearch = () => {
+  const [formData, setFormData] = useState<FormData>({
+    user: '',
+  });
+
+  const [address, setAddress] = useState<Address>();
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setFormData({ ...formData, [name]: value });
+  };
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    axios
+      .get(`https://api.github.com/users/${formData.user}`)
+      .then((response) => {
+        setAddress(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        setAddress(undefined);
+        console.log(error);
+      });
+  };
+
   return (
     <div className="git-search-container container">
       <div className="search-container">
         <h1>Encontre um perfil Github</h1>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="form-container">
             <input
               type="text"
+              name="user"
+              value={formData.user}
               className="search-input"
               placeholder="Usuário Github"
-              onChange={() => {}}
+              onChange={handleChange}
             />
             <button type="submit" className="btn btn-primary search-button">
               Encontrar
@@ -18,18 +59,35 @@ const GitSearch = () => {
           </div>
         </form>
       </div>
-      <div className="search-container-result">
-        <div className="search-container-img">
-          <img src="https://criticalhits.com.br/wp-content/uploads/2019/11/madara-uchiha.jpg" alt="Nome da imagem" />
+      {address && (
+        <div className="search-container-result">
+          <div className="search-container-img">
+            <img
+              src={address.avatar_url}
+              alt="Nome da imagem"
+            />
+          </div>
+          <div className="search-container-info">
+            <h6>Informações</h6>
+            <p>
+              <b>Perfil:</b>
+              <a href={address.html_url}>{address.html_url}</a>
+            </p>
+            <p>
+              <b>Seguidores:</b>
+              {address.followers}
+            </p>
+            <p>
+              <b>Localidade:</b>
+              {address.location}
+            </p>
+            <p>
+              <b>Nome:</b>
+              {address.name}
+            </p>
+          </div>
         </div>
-        <div className="search-container-info">
-          <h6>Informações</h6>
-          <p><b>Perfil:</b><a href="https://github.com/LucasAlvesDaCosta">https://github.com/LucasAlvesDaCosta</a></p>
-          <p><b>Seguidores:</b>6000{}</p>
-          <p><b>Localidade:</b>vila da folha{}</p>
-          <p><b>Nome:</b>Madara Uchira{}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
