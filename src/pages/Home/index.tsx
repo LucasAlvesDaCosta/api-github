@@ -6,7 +6,9 @@ const Home = () => {
     return (
         <div className="home-container">
             <Link to="/cepsearch">
-                <button className="btn btn-primary btn-lg start-button">Iniciar</button>
+                <h1>Desafio Github API</h1>
+                <h6>Bootcamp Spring React - DevSuperior</h6>
+                <button className="btn btn-primary btn-lg start-button">Começar</button>
             </Link>
         </div>
     );

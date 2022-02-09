@@ -2,6 +2,9 @@
     padding: 40px;
 }
 
+.home-container h6{
+    color: #7E7E7E;
+}
 .start-button {
     color: #fff;
 }
