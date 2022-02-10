@@ -19,6 +19,7 @@ const GitSearch = () => {
   });
   const [address, setAddress] = useState<Address>();
   const [isLoading, setIsLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -28,6 +29,7 @@ const GitSearch = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
+    setNotFound(false);
     axios
       .get(`https://api.github.com/users/${formData.user}`)
       .then((response) => {
@@ -39,6 +41,7 @@ const GitSearch = () => {
       })
       .catch((error) => {
         setAddress(undefined);
+        setNotFound(true);
         console.log(error);
       });
   };
@@ -93,7 +96,7 @@ const GitSearch = () => {
           </div>
         )
       )}
-      {!address && (
+      {(!address && notFound) && (
         <div className="search-container-result">
           <h3>User not found.</h3>
         </div>
