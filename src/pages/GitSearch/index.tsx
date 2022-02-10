@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import GitSearchInfoLoader from './GitSearchInfoLoader';
 import './styles.css';
 type FormData = {
   user: string;
@@ -16,9 +17,8 @@ const GitSearch = () => {
   const [formData, setFormData] = useState<FormData>({
     user: '',
   });
-
   const [address, setAddress] = useState<Address>();
-
+  const [isLoading, setIsLoading] = useState(false);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
@@ -27,11 +27,15 @@ const GitSearch = () => {
   };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
     axios
       .get(`https://api.github.com/users/${formData.user}`)
       .then((response) => {
         setAddress(response.data);
         console.log(response.data);
+      })
+      .finally(() => {
+        setIsLoading(false);
       })
       .catch((error) => {
         setAddress(undefined);
@@ -59,33 +63,39 @@ const GitSearch = () => {
           </div>
         </form>
       </div>
-      {address && (
+      {isLoading ? (
+        <GitSearchInfoLoader />
+      ) : (
+        address && (
+          <div className="search-container-result">
+            <div className="search-container-img">
+              <img src={address.avatar_url} alt={address.name} />
+            </div>
+            <div className="search-container-info">
+              <h6>Informações</h6>
+              <p>
+                <b>Perfil:</b>
+                <a href={address.html_url}>{address.html_url}</a>
+              </p>
+              <p>
+                <b>Seguidores:</b>
+                {address.followers}
+              </p>
+              <p>
+                <b>Localidade:</b>
+                {address.location}
+              </p>
+              <p>
+                <b>Nome:</b>
+                {address.name}
+              </p>
+            </div>
+          </div>
+        )
+      )}
+      {!address && (
         <div className="search-container-result">
-          <div className="search-container-img">
-            <img
-              src={address.avatar_url}
-              alt="Nome da imagem"
-            />
-          </div>
-          <div className="search-container-info">
-            <h6>Informações</h6>
-            <p>
-              <b>Perfil:</b>
-              <a href={address.html_url}>{address.html_url}</a>
-            </p>
-            <p>
-              <b>Seguidores:</b>
-              {address.followers}
-            </p>
-            <p>
-              <b>Localidade:</b>
-              {address.location}
-            </p>
-            <p>
-              <b>Nome:</b>
-              {address.name}
-            </p>
-          </div>
+          <h3>User not found.</h3>
         </div>
       )}
     </div>
